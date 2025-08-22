@@ -48,6 +48,45 @@ namespace CronManager.Api.Endpoints
                 }
             });
 
+            app.MapPost("/api/crons/{id}/run", async (Guid id, InMemoryJobStore store) =>
+            {
+                try
+                {
+                    await store.RunNowAsync(id);
+                    return Results.Ok();
+                }
+                catch (KeyNotFoundException)
+                {
+                    return Results.NotFound();
+                }
+            });
+
+            app.MapPatch("/api/crons/{id}/pause", async (Guid id, InMemoryJobStore store) =>
+            {
+                try
+                {
+                    await store.PauseAsync(id);
+                    return Results.NoContent();
+                }
+                catch (KeyNotFoundException)
+                {
+                    return Results.NotFound();
+                }
+            });
+
+            app.MapPatch("/api/crons/{id}/resume", async (Guid id, InMemoryJobStore store) =>
+            {
+                try
+                {
+                    await store.ResumeAsync(id);
+                    return Results.NoContent();
+                }
+                catch (KeyNotFoundException)
+                {
+                    return Results.NotFound();
+                }
+            });
+
             app.MapDelete("/api/crons/{id}", async (Guid id, InMemoryJobStore store) =>
             {
                 try

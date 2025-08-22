@@ -37,6 +37,19 @@ namespace CronManager.Api.Services
             await _scheduler.ScheduleJob(quartzJob, trigger);
         }
 
+        public IEnumerable<CronJob> GetAll()
+        {
+            return _jobs.Values;
+        }
+
+        public CronJob? GetById(Guid id)
+        {
+            if (_jobs.TryGetValue(id, out var job))
+                return job;
+
+            return null;
+        }
+
         public async Task UpdateAsync(CronJob job)
         {
             if (!_jobs.ContainsKey(job.Id))
@@ -77,17 +90,28 @@ namespace CronManager.Api.Services
             _jobs.Remove(id);
         }
 
-        public IEnumerable<CronJob> GetAll()
+        public async Task RunNowAsync(Guid id)
         {
-            return _jobs.Values;
+            if (!_jobs.ContainsKey(id))
+                throw new KeyNotFoundException($"CronJob with Id {id} not found.");
+
+            await _scheduler.TriggerJob(new JobKey(id.ToString()));
         }
 
-        public CronJob? GetById(Guid id)
+        public async Task PauseAsync(Guid id)
         {
-            if (_jobs.TryGetValue(id, out var job))
-                return job;
+            if (!_jobs.ContainsKey(id))
+                throw new KeyNotFoundException($"CronJob with Id {id} not found.");
 
-            return null;
+            await _scheduler.PauseJob(new JobKey(id.ToString()));
+        }
+
+        public async Task ResumeAsync(Guid id)
+        {
+            if (!_jobs.ContainsKey(id))
+                throw new KeyNotFoundException($"CronJob with Id {id} not found.");
+
+            await _scheduler.ResumeJob(new JobKey(id.ToString()));
         }
         
         // public void Add(CronJob job)
