@@ -7,9 +7,9 @@ namespace CronManager.Api.Endpoints
     {
         public static void MapCronEndpoints(this WebApplication app)
         {
-            app.MapPost("/api/crons", (CronJob job, InMemoryJobStore store) =>
+            app.MapPost("/api/crons", async (CronJob job, InMemoryJobStore store) =>
             {
-                store.Add(job);
+                await store.AddAsync(job);
                 return Results.Created($"/api/crons/{job.Id}", job);
             });
 
@@ -32,14 +32,14 @@ namespace CronManager.Api.Endpoints
                 }
             });
 
-            app.MapPut("/api/crons/{id}", (Guid id, CronJob job, InMemoryJobStore store) =>
+            app.MapPut("/api/crons/{id}", async (Guid id, CronJob job, InMemoryJobStore store) =>
             {
                 if (id != job.Id)
                     return Results.BadRequest("Id in route does not match Id in body.");
 
                 try
                 {
-                    store.Update(job);
+                    await store.UpdateAsync(job);
                     return Results.NoContent();
                 }
                 catch (KeyNotFoundException)
@@ -48,11 +48,11 @@ namespace CronManager.Api.Endpoints
                 }
             });
 
-            app.MapDelete("/api/crons/{id}", (Guid id, InMemoryJobStore store) =>
+            app.MapDelete("/api/crons/{id}", async (Guid id, InMemoryJobStore store) =>
             {
                 try
                 {
-                    store.Delete(id);
+                    await store.DeleteAsync(id);
                     return Results.NoContent();
                 }
                 catch (KeyNotFoundException)
