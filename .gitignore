@@ -1,0 +1,30 @@
+# Build results
+bin/
+obj/
+out/
+
+# Visual Studio Code
+.vscode/
+.history/
+
+# User-specific
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Logs
+*.log
+
+# Packages
+*.nupkg
+*.snupkg
+packages/
+*.nuget.props
+*.nuget.targets
+
+# Environment files
+.env
+
+# Docker
+docker-compose.override.yml
