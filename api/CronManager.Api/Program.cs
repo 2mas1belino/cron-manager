@@ -43,15 +43,14 @@ var app = builder.Build();
 
 app.MapCronEndpoints();
 
-// Optional root test endpoint
-app.MapGet("/", () => "Cron Manager API is running!");
+// app.MapGet("/", () => "Cron Manager API is running!");
 
-app.MapPost("/test-job", async (HttpContext ctx) =>
-{
-    using var reader = new StreamReader(ctx.Request.Body);
-    var body = await reader.ReadToEndAsync();
-    Console.WriteLine($"[{DateTime.UtcNow}] Received job payload: {body}");
-    return Results.Ok();
-});
+// app.MapPost("/test-job", async (HttpContext ctx) =>
+// {
+//     using var reader = new StreamReader(ctx.Request.Body);
+//     var body = await reader.ReadToEndAsync();
+//     Console.WriteLine($"[{DateTime.UtcNow}] Received job payload: {body}");
+//     return Results.Ok();
+// });
 
 app.Run();

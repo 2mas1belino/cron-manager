@@ -14,16 +14,37 @@ public class HttpNotifyJob : IJob
 
     public async Task Execute(IJobExecutionContext context)
     {
-        var client = _httpClientFactory.CreateClient();
-        var jobData = context.MergedJobDataMap;
-        var uri = jobData.GetString("Uri");
-        var body = jobData.GetString("Body");
+        // var client = _httpClientFactory.CreateClient();
+        // var jobData = context.MergedJobDataMap;
+        // var uri = jobData.GetString("Uri");
+        // var body = jobData.GetString("Body");
 
-        if (!string.IsNullOrEmpty(uri))
+        // if (!string.IsNullOrEmpty(uri))
+        // {
+        //     var content = new StringContent(body ?? "", Encoding.UTF8, "application/json");
+        //     await client.PostAsync(uri, content);
+        //     Console.WriteLine($"[{DateTime.UtcNow}] Sent job to {uri} with body: {body}");
+        // }
+
+        var dataMap = context.JobDetail.JobDataMap;
+        var uri = dataMap.GetString("Uri")!;
+        var method = dataMap.GetString("HttpMethod")!;
+        var body = dataMap.GetString("Body") ?? "";
+
+        var client = _httpClientFactory.CreateClient();
+        var content = new StringContent(body, Encoding.UTF8, "application/json");
+
+        var request = new HttpRequestMessage(new HttpMethod(method), uri)
         {
-            var content = new StringContent(body ?? "", Encoding.UTF8, "application/json");
-            await client.PostAsync(uri, content);
-            Console.WriteLine($"[{DateTime.UtcNow}] Sent job to {uri} with body: {body}");
+            Content = content
+        };
+
+        var response = await client.SendAsync(request);
+
+        // Optional: log success/failure
+        if (!response.IsSuccessStatusCode)
+        {
+            Console.WriteLine($"Failed notifying {uri}: {response.StatusCode}");
         }
     }
 }

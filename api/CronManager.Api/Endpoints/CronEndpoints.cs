@@ -31,6 +31,7 @@ namespace CronManager.Api.Endpoints
                 return Results.Created($"/api/crons/{job.Id}", job);
             });
 
+            // READ ALL
             app.MapGet("/api/crons", async (ISchedulerFactory schedulerFactory) =>
             {
                 var scheduler = await schedulerFactory.GetScheduler();

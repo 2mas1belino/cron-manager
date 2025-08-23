@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
+// I STARTED THIS PROJECT USING THIS SERVICE THAT WORKS WITH IN MEMORY STORAGE, BUT CURRENTLY THE CRONJOBS ARE BEING STORED ON A LOCAL DB AS YOU CAN SEE IN Endpoints/CronEndpoints.cs
 namespace CronManager.Api.Services
 {
     public class InMemoryJobStore
@@ -113,35 +114,6 @@ namespace CronManager.Api.Services
 
             await _scheduler.ResumeJob(new JobKey(id.ToString()));
         }
-        
-        // public void Add(CronJob job)
-        // {
-        //     _jobs[job.Id] = job;
-        // }
-
-        // public void Update(CronJob job)
-        // {
-        //     if (_jobs.ContainsKey(job.Id))
-        //     {
-        //         _jobs[job.Id] = job;
-        //     }
-        //     else
-        //     {
-        //         throw new KeyNotFoundException($"CronJob with Id {job.Id} not found.");
-        //     }
-        // }
-
-        // public void Delete(Guid id)
-        // {
-        //     if (_jobs.ContainsKey(id))
-        //     {
-        //         _jobs.Remove(id);
-        //     }
-        //     else
-        //     {
-        //         throw new KeyNotFoundException($"CronJob with Id {id} not found.");
-        //     }
-        // }
     }
 }
 
