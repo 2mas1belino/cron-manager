@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { fetchJobs, runJob, pauseJob, resumeJob, deleteJob } from '../services/cronService';
 import { CronJobCard } from '../components/CronJobCard';
 import type { CronJob } from '../types/cron';
@@ -8,17 +9,16 @@ export function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const navigate = useNavigate();
+
   const loadJobs = async () => {
     try {
       setLoading(true);
       const data = await fetchJobs();
       setJobs(data);
     } catch (err) {
-      if (err instanceof Error) {
-      setError(err.message);
-    } else {
-      setError('An unexpected error occurred');
-    }
+      if (err instanceof Error) setError(err.message);
+      else setError('An unexpected error occurred');
     } finally {
       setLoading(false);
     }
@@ -38,7 +38,16 @@ export function Dashboard() {
 
   return (
     <div className="max-w-3xl mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Cron Jobs Dashboard</h1>
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold">Cron Jobs Dashboard</h1>
+        <button
+          onClick={() => navigate('/create')}
+          className="bg-green-500 text-white px-4 py-2 rounded"
+        >
+          Create Job
+        </button>
+      </div>
+
       {jobs.map(job => (
         <CronJobCard
           key={job.id}
@@ -47,6 +56,7 @@ export function Dashboard() {
           onPause={handlePause}
           onResume={handleResume}
           onDelete={handleDelete}
+          onEdit={() => navigate(`/edit/${job.id}`)}
         />
       ))}
     </div>

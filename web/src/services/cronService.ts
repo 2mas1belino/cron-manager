@@ -8,6 +8,12 @@ export async function fetchJobs(): Promise<CronJob[]> {
   return res.json();
 }
 
+export async function fetchJob(id: string): Promise<CronJob> {
+  const res = await fetch(`${API_BASE}/${id}`);
+  if (!res.ok) throw new Error('Failed to fetch job');
+  return res.json();
+}
+
 export async function createJob(job: Partial<CronJob>): Promise<CronJob> {
   const res = await fetch(API_BASE, {
     method: 'POST',
@@ -18,8 +24,8 @@ export async function createJob(job: Partial<CronJob>): Promise<CronJob> {
   return res.json();
 }
 
-export async function updateJob(id: string, job: Partial<CronJob>): Promise<void> {
-    const res = await fetch(`${API_BASE}/${id}`, {
+export async function updateJob(job: Partial<CronJob>): Promise<void> {
+    const res = await fetch(`${API_BASE}/${job.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(job),
