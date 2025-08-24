@@ -8,14 +8,19 @@ using CronManager.Api.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddHttpClient();
+// Allow CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:5173") // Vite dev server
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
 
-// Register InMemoryJobStore for DI
-// builder.Services.AddSingleton<InMemoryJobStore>(sp =>
-// {
-//     var scheduler = sp.GetRequiredService<ISchedulerFactory>().GetScheduler().Result;
-//     return new InMemoryJobStore(scheduler);
-// });
+builder.Services.AddHttpClient();
 
 builder.Services.AddDbContext<CronDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -41,6 +46,8 @@ builder.Services.AddQuartzHostedService(opt => opt.WaitForJobsToComplete = true)
 
 var app = builder.Build();
 
+app.UseCors("AllowFrontend");
+app.MapGet("/ping", () => "pong").RequireCors("AllowFrontend");
 app.MapCronEndpoints();
 
 // app.MapGet("/", () => "Cron Manager API is running!");
