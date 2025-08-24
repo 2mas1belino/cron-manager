@@ -1,4 +1,3 @@
-import React from 'react';
 import type { CronJob } from '../types/cron';
 
 interface Props {
