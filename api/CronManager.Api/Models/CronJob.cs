@@ -9,4 +9,5 @@ public class CronJob
     public string Schedule { get; set; } = default!;
     public string TimeZone { get; set; } = "UTC";
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+    public string Status { get; set; } = "active";
 }

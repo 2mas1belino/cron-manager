@@ -28,7 +28,20 @@ namespace CronManager.Api.Endpoints
 
                 await scheduler.ScheduleJob(jobDetail, trigger);
 
-                return Results.Created($"/api/crons/{job.Id}", job);
+                var triggerState = await scheduler.GetTriggerState(trigger.Key);
+                var status = triggerState == Quartz.TriggerState.Paused ? "paused" : "active";
+
+                return Results.Created($"/api/crons/{job.Id}", new CronJob
+                {
+                    Id = job.Id,
+                    Uri = job.Uri,
+                    HttpMethod = job.HttpMethod,
+                    Body = job.Body,
+                    Schedule = job.Schedule,
+                    TimeZone = job.TimeZone,
+                    CreatedAt = job.CreatedAt,
+                    Status = status
+                });
             });
 
             // READ ALL
@@ -44,11 +57,11 @@ namespace CronManager.Api.Endpoints
                     foreach (var key in keys)
                     {
                         var detail = await scheduler.GetJobDetail(key);
-                        var triggers = await scheduler.GetTriggersOfJob(key);
-                        var trigger = triggers.FirstOrDefault() as ICronTrigger;
+                        var trigger = (await scheduler.GetTriggersOfJob(key)).FirstOrDefault() as ICronTrigger;
+                        if (trigger == null) continue;
 
-                        if (trigger == null)
-                            continue;
+                        var triggerState = await scheduler.GetTriggerState(trigger.Key);
+                        var status = triggerState == Quartz.TriggerState.Paused ? "paused" : "active";
 
                         jobs.Add(new CronJob
                         {
@@ -57,7 +70,9 @@ namespace CronManager.Api.Endpoints
                             HttpMethod = detail.JobDataMap.GetString("HttpMethod") ?? "GET",
                             Body = detail.JobDataMap.GetString("Body") ?? "",
                             Schedule = trigger.CronExpressionString ?? "",
-                            TimeZone = trigger.TimeZone.Id
+                            TimeZone = trigger.TimeZone.Id,
+                            CreatedAt = DateTimeOffset.UtcNow,
+                            Status = status
                         });
                     }
                 }
@@ -75,27 +90,28 @@ namespace CronManager.Api.Endpoints
                 if (detail == null)
                     return Results.NotFound();
 
-                var triggers = await scheduler.GetTriggersOfJob(key);
-                var trigger = triggers.FirstOrDefault() as ICronTrigger;
-
+                var trigger = (await scheduler.GetTriggersOfJob(key)).FirstOrDefault() as ICronTrigger;
                 if (trigger == null)
                     return Results.NotFound();
 
-                var job = new CronJob
+                var triggerState = await scheduler.GetTriggerState(trigger.Key);
+                var status = triggerState == Quartz.TriggerState.Paused ? "paused" : "active";
+
+                return Results.Ok(new CronJob
                 {
                     Id = id,
                     Uri = detail.JobDataMap.GetString("Uri") ?? "",
                     HttpMethod = detail.JobDataMap.GetString("HttpMethod") ?? "GET",
                     Body = detail.JobDataMap.GetString("Body") ?? "",
                     Schedule = trigger.CronExpressionString ?? "",
-                    TimeZone = trigger.TimeZone.Id
-                };
-
-                return Results.Ok(job);
+                    TimeZone = trigger.TimeZone.Id,
+                    CreatedAt = DateTimeOffset.UtcNow,
+                    Status = status
+                });
             });
 
             // UPDATE
-            app.MapPut("/api/crons/{id}", async (Guid id, CronJob job,ISchedulerFactory schedulerFactory) =>
+            app.MapPut("/api/crons/{id}", async (Guid id, CronJob job, ISchedulerFactory schedulerFactory) =>
             {
                 var scheduler = await schedulerFactory.GetScheduler();
 
@@ -139,7 +155,7 @@ namespace CronManager.Api.Endpoints
                 return Results.NotFound();
             });
 
-            // PAUSE
+           // PAUSE
             app.MapPatch("/api/crons/{id}/pause", async (Guid id, ISchedulerFactory schedulerFactory) =>
             {
                 var scheduler = await schedulerFactory.GetScheduler();
