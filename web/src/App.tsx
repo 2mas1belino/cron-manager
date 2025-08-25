@@ -1,8 +1,8 @@
+import './App.css'
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Dashboard } from './pages/Dashboard';
 import { CreateCron } from './pages/CreateCronJob';
 import { EditCron } from './pages/EditCronJob';
-import './App.css'
 import { ThemeProvider } from './components/shadcn/theme-provider';
 
 function App() {
