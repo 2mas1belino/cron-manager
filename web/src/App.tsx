@@ -3,9 +3,11 @@ import { Dashboard } from './pages/Dashboard';
 import { CreateCron } from './pages/CreateCronJob';
 import { EditCron } from './pages/EditCronJob';
 import './App.css'
+import { ThemeProvider } from './components/shadcn/theme-provider';
 
 function App() {
   return (
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <BrowserRouter>
         <Routes>
           <Route path="/dashboard" element={<Dashboard />} />
@@ -14,6 +16,7 @@ function App() {
           <Route path="*" element={<Dashboard />} />
         </Routes>
       </BrowserRouter>
+    </ThemeProvider>
     );
 }
 

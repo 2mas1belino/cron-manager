@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { fetchJobs, runJob, pauseJob, resumeJob, deleteJob } from '../services/cronService';
 import { CronJobCard } from '../components/CronJobCard';
 import type { CronJob } from '../types/cron';
+import { ModeToggle } from '@/components/shadcn/mode-toggle';
 
 export function Dashboard() {
   const [jobs, setJobs] = useState<CronJob[]>([]);
@@ -37,9 +38,12 @@ export function Dashboard() {
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (
-    <div className="max-w-3xl mx-auto p-4">
+    <div className="mx-auto">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Cron Jobs Dashboard</h1>
+        <h1 className="text-2xl font-bold">Cron Jobs Manager</h1>
+        <ModeToggle></ModeToggle>
+      </div>
+      <div className="flex justify-between items-center mb-4">
         <button
           onClick={() => navigate('/create')}
           className="bg-green-500 text-white px-4 py-2 rounded"
