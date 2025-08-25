@@ -9,6 +9,7 @@ import {
 } from "../services/cronService";
 import { CronJobCard } from "../components/CronJobCard";
 import type { CronJob } from "../types/cron";
+import { Separator } from "@/components/ui/separator"
 // import { ModeToggle } from "@/components/shadcn/mode-toggle";
 
 export function Dashboard() {
@@ -57,13 +58,13 @@ export function Dashboard() {
 
   return (
     <div>
-      <div className="flex items-start justify-between mt-3">
+      <div className="flex items-start justify-between my-3">
         <h2 className="text-xl font-bold ml-3">CRON jobs manager</h2>
         {/* <div className="mr-3">
           <ModeToggle></ModeToggle>
         </div> */}
       </div>
-
+      <Separator />
       <div className="max-w-4xl mx-auto mt-8 px-4">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-bold">Jobs</h2>
