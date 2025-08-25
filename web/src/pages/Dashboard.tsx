@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   fetchJobs,
   runJob,
@@ -9,8 +9,7 @@ import {
 } from "../services/cronService";
 import { CronJobCard } from "../components/CronJobCard";
 import type { CronJob } from "../types/cron";
-import { ModeToggle } from "@/components/shadcn/mode-toggle";
-import { Button } from "@/components/ui/button";
+// import { ModeToggle } from "@/components/shadcn/mode-toggle";
 
 export function Dashboard() {
   const [jobs, setJobs] = useState<CronJob[]>([]);
@@ -60,9 +59,9 @@ export function Dashboard() {
     <div>
       <div className="flex items-start justify-between mt-3">
         <h2 className="text-xl font-bold ml-3">CRON jobs manager</h2>
-        <div className="mr-3">
+        {/* <div className="mr-3">
           <ModeToggle></ModeToggle>
-        </div>
+        </div> */}
       </div>
 
       <div className="max-w-4xl mx-auto mt-8 px-4">

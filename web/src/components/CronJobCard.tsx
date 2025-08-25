@@ -1,4 +1,4 @@
-import type { CronJob } from '../types/cron';
+import type { CronJob } from "../types/cron";
 
 interface Props {
   job: CronJob;
@@ -6,28 +6,78 @@ interface Props {
   onPause: (id: string) => void;
   onResume: (id: string) => void;
   onDelete: (id: string) => void;
-  onEdit?: () => void; // optional edit callback
+  onEdit?: () => void;
 }
 
-export function CronJobCard({ job, onRun, onPause, onResume, onDelete, onEdit }: Props) {
+export function CronJobCard({
+  job,
+  onRun,
+  onPause,
+  onResume,
+  onDelete,
+  onEdit,
+}: Props) {
   return (
-    <div className="border rounded p-4 shadow-sm mb-2 flex justify-between items-center">
-      <div>
-        <h3 className="font-bold">{job.uri}</h3>
-        <p className="text-sm text-gray-600">{job.schedule} ({job.timeZone})</p>
-        <p className="text-sm">{job.httpMethod} - {job.status}</p>
+    <div className="bg-gray-900 rounded-lg shadow-md p-4 mb-4">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-2">
+        <h3 className="text-lg"><span className="font-semibold text-gray-400">URI: </span>{job.uri}</h3>
+        <span
+          className={`text-xs font-medium px-2 py-1 rounded ${
+            job.status === "active" ? "bg-purple-600" : "bg-gray-700"
+          }`}
+        >
+          {job.status.toUpperCase()}
+        </span>
       </div>
-      <div className="flex gap-2">
-        <button onClick={() => onRun(job.id)} className="bg-blue-500 text-white px-2 py-1 rounded">Run</button>
-        {job.status === 'active' ? (
-          <button onClick={() => onPause(job.id)} className="bg-yellow-400 text-white px-2 py-1 rounded">Pause</button>
+
+      {/* Schedule & Command */}
+      <div className="text-sm">
+        <p>
+          <span className="font-medium text-gray-400 mb-2">Schedule:</span> {job.schedule}
+        </p>
+        <p>
+          <span className="font-medium text-gray-400 mb-2">Body:</span> {job.body}
+        </p>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex gap-2 flex-wrap mt-4">
+        <button
+          onClick={() => onRun(job.id)}
+          className="bg-gray-700 text-white text-xs px-3 py-1 rounded hover:bg-gray-600"
+        >
+          Run
+        </button>
+        {job.status === "active" ? (
+          <button
+            onClick={() => onPause(job.id)}
+            className="bg-gray-700 text-white text-xs px-3 py-1 rounded hover:bg-gray-600"
+          >
+            Pause
+          </button>
         ) : (
-          <button onClick={() => onResume(job.id)} className="bg-green-500 text-white px-2 py-1 rounded">Resume</button>
+          <button
+            onClick={() => onResume(job.id)}
+            className="bg-gray-700 text-white text-xs px-3 py-1 rounded hover:bg-gray-600"
+          >
+            Resume
+          </button>
         )}
         {onEdit && (
-          <button onClick={onEdit} className="bg-indigo-500 text-white px-2 py-1 rounded">Edit</button>
+          <button
+            onClick={onEdit}
+            className="bg-gray-700 text-white text-xs px-3 py-1 rounded hover:bg-gray-600"
+          >
+            Edit
+          </button>
         )}
-        <button onClick={() => onDelete(job.id)} className="bg-red-500 text-white px-2 py-1 rounded">Delete</button>
+        <button
+          onClick={() => onDelete(job.id)}
+          className="bg-red-600 text-white text-xs px-3 py-1 rounded hover:bg-red-500"
+        >
+          Delete
+        </button>
       </div>
     </div>
   );
