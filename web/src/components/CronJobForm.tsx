@@ -1,3 +1,5 @@
+"use client";
+
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -7,6 +9,8 @@ import {
 import type { CronJob } from "../types/cron";
 import { createJob, updateJob } from "../services/cronService";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+
 import {
   Select,
   SelectContent,
@@ -49,11 +53,22 @@ export function CronJobForm({ job }: Props) {
     try {
       if (job) {
         await updateJob({ ...data, id: job.id });
+        toast("Job updated successfully", {
+          description: "Your cron job has been updated.",
+        });
       } else {
         await createJob(data);
+        toast("Job created successfully", {
+          description: "Your cron job has been added.",
+        });
       }
       navigate("/dashboard");
-    } catch (err) {
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        toast("Error", { description: err.message });
+      } else {
+        toast("Error", { description: "Something went wrong." });
+      }
       console.error(err);
     }
   };
@@ -66,8 +81,7 @@ export function CronJobForm({ job }: Props) {
       <div className="flex space-x-2 items-start">
         {/* HTTP Method */}
         <div className="w-32 relative">
-          <label className="block font-bold mb-1">HTTP Method</label>{" "}
-          {/* hidden label space for alignment */}
+          <label className="block font-bold mb-1">HTTP Method</label>
           <Controller
             name="httpMethod"
             control={control}

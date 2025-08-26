@@ -4,11 +4,13 @@ import { Dashboard } from './pages/Dashboard';
 import { CreateCron } from './pages/CreateCronJob';
 import { EditCron } from './pages/EditCronJob';
 import { ThemeProvider } from './components/shadcn/theme-provider';
+import { Toaster } from "@/components/ui/sonner"
 
 function App() {
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <BrowserRouter>
+        <Toaster />
         <Routes>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/create" element={<CreateCron />} />
