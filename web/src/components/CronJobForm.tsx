@@ -1,9 +1,16 @@
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CronJobSchema, type CronJobFormValues } from "../validation/cronJobSchema";
 import type { CronJob } from '../types/cron';
 import { createJob, updateJob } from '../services/cronService';
 import { useNavigate } from 'react-router-dom';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface Props {
   job?: CronJob;
@@ -12,7 +19,7 @@ interface Props {
 export function CronJobForm({ job }: Props) {
   const navigate = useNavigate();
 
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<CronJobFormValues>({
+  const { register, handleSubmit, control, formState: { errors, isSubmitting } } = useForm<CronJobFormValues>({
     resolver: zodResolver(CronJobSchema),
     defaultValues: {
       uri: job?.uri || "",
@@ -50,12 +57,26 @@ export function CronJobForm({ job }: Props) {
 
   <div>
     <label className="block font-bold mb-1">HTTP Method</label>
-    <select {...register("httpMethod")} className="w-full border px-2 py-1 rounded">
-      {["GET","POST","PUT","PATCH","DELETE"].map(m => (
-        <option key={m} value={m}>{m}</option>
-      ))}
-    </select>
-    {errors.httpMethod && <p className="text-red-500 text-sm">{errors.httpMethod.message}</p>}
+    <Controller
+      name="httpMethod"
+      control={control}
+      render={({ field }) => (
+        <Select
+          value={field.value}
+          onValueChange={field.onChange}
+        >
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Select HTTP method" />
+          </SelectTrigger>
+          <SelectContent>
+            {["GET","POST","PUT","PATCH","DELETE"].map((m) => (
+              <SelectItem key={m} value={m}>{m}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
+    />
+    {errors.httpMethod && (<p className="text-red-500 text-sm">{errors.httpMethod.message}</p>)}
   </div>
 
   <div>
