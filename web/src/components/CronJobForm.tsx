@@ -22,7 +22,7 @@ export function CronJobForm({ job }: Props) {
   const { register, handleSubmit, control, formState: { errors, isSubmitting } } = useForm<CronJobFormValues>({
     resolver: zodResolver(CronJobSchema),
     defaultValues: {
-      uri: job?.uri || "",
+      uri: job?.uri || "http://receiver:5000/notify",
       httpMethod: job?.httpMethod || "POST",
       body: job?.body || "",
       schedule: job?.schedule || "",
@@ -54,6 +54,7 @@ export function CronJobForm({ job }: Props) {
     <input
       type="text"
       {...register("uri")}
+      placeholder="http://receiver:5000/notify"
       className="w-full border px-2 py-1 rounded"
     />
     {errors.uri && <p className="text-red-500 text-sm">{errors.uri.message}</p>}
