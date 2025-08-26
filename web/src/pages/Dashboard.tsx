@@ -9,13 +9,21 @@ import {
 } from "../services/cronService";
 import { CronJobCard } from "../components/CronJobCard";
 import type { CronJob } from "../types/cron";
-import { Separator } from "@/components/ui/separator"
-// import { ModeToggle } from "@/components/shadcn/mode-toggle";
+import { Separator } from "@/components/ui/separator";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export function Dashboard() {
   const [jobs, setJobs] = useState<CronJob[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [methodFilter, setMethodFilter] = useState<string>("all");
 
   const navigate = useNavigate();
 
@@ -53,6 +61,13 @@ export function Dashboard() {
     loadJobs();
   };
 
+  const filteredJobs = jobs.filter((job) => {
+    const statusMatch = statusFilter === "all" || job.status === statusFilter;
+    const methodMatch =
+      methodFilter === "all" || job.httpMethod === methodFilter;
+    return statusMatch && methodMatch;
+  });
+
   if (loading) return <p>Loading...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
 
@@ -60,14 +75,41 @@ export function Dashboard() {
     <div>
       <div className="flex items-start justify-between my-3">
         <h2 className="text-xl font-bold ml-3">CRON jobs manager</h2>
-        {/* <div className="mr-3">
-          <ModeToggle></ModeToggle>
-        </div> */}
       </div>
       <Separator />
       <div className="max-w-4xl mx-auto mt-8 px-4">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold">Jobs</h2>
+          <div className="flex items-center gap-4">
+            <h2 className="text-xl font-bold">Jobs</h2>
+
+            <div className="flex gap-2">
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-32">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="paused">Paused</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select value={methodFilter} onValueChange={setMethodFilter}>
+                <SelectTrigger className="w-32">
+                  <SelectValue placeholder="Method" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="GET">GET</SelectItem>
+                  <SelectItem value="POST">POST</SelectItem>
+                  <SelectItem value="PUT">PUT</SelectItem>
+                  <SelectItem value="PATCH">PATCH</SelectItem>
+                  <SelectItem value="DELETE">DELETE</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
           <button
             onClick={() => navigate("/create")}
             className="px-4 py-2 bg-primary rounded"
@@ -76,7 +118,7 @@ export function Dashboard() {
           </button>
         </div>
 
-        {jobs.map((job) => (
+        {filteredJobs.map((job) => (
           <CronJobCard
             key={job.id}
             job={job}
@@ -87,6 +129,10 @@ export function Dashboard() {
             onEdit={() => navigate(`/edit/${job.id}`)}
           />
         ))}
+
+        {filteredJobs.length === 0 && (
+          <p className="text-gray-400 text-center mt-6">No jobs found.</p>
+        )}
       </div>
     </div>
   );
