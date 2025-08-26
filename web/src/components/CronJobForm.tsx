@@ -9,6 +9,7 @@ interface Props {
 
 export function CronJobForm({ job }: Props) {
   const [uri, setUri] = useState(job?.uri || '');
+  const [uriError, setUriError] = useState<string | null>(null);
   const [httpMethod, setHttpMethod] = useState<'GET'|'POST'|'PUT'|'PATCH'|'DELETE'>(job?.httpMethod || 'POST');
   const [body, setBody] = useState(job?.body || '');
   const [schedule, setSchedule] = useState(job?.schedule || '');
@@ -18,10 +19,29 @@ export function CronJobForm({ job }: Props) {
 
   const navigate = useNavigate();
 
+  function validateUri(value: string) {
+    if (!value) return "URI is required";
+    try {
+      new URL(value);
+      return null;
+    } catch {
+      return "Invalid URL format (must start with http:// or https://)";
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+
+    const uriValidation = validateUri(uri);
+    if (uriValidation) {
+      setUriError(uriValidation);
+      setLoading(false);
+      return; // stop submission
+    } else {
+      setUriError(null);
+    }
 
     const cronJobData: Partial<CronJob> = {
       id: job?.id,
@@ -59,10 +79,15 @@ export function CronJobForm({ job }: Props) {
         <input
           type="text"
           value={uri}
-          onChange={e => setUri(e.target.value)}
+          onChange={e => {
+            setUri(e.target.value);
+            if (uriError) setUriError(validateUri(e.target.value));
+          }}
+          onBlur={() => setUriError(validateUri(uri))}
           required
           className="w-full border px-2 py-1 rounded"
         />
+        {uriError && <p className="text-red-500 text-sm">{uriError}</p>}
       </div>
 
       <div>
