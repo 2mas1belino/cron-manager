@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { CronJobSchema, type CronJobFormValues } from "../validation/cronJobSchema";
 import type { CronJob } from '../types/cron';
 import { createJob, updateJob } from '../services/cronService';
 import { useNavigate } from 'react-router-dom';
@@ -8,142 +10,93 @@ interface Props {
 }
 
 export function CronJobForm({ job }: Props) {
-  const [uri, setUri] = useState(job?.uri || '');
-  const [uriError, setUriError] = useState<string | null>(null);
-  const [httpMethod, setHttpMethod] = useState<'GET'|'POST'|'PUT'|'PATCH'|'DELETE'>(job?.httpMethod || 'POST');
-  const [body, setBody] = useState(job?.body || '');
-  const [schedule, setSchedule] = useState(job?.schedule || '');
-  const [timeZone, setTimeZone] = useState(job?.timeZone || 'UTC');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
   const navigate = useNavigate();
 
-  function validateUri(value: string) {
-    if (!value) return "URI is required";
-    try {
-      new URL(value);
-      return null;
-    } catch {
-      return "Invalid URL format (must start with http:// or https://)";
-    }
-  }
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<CronJobFormValues>({
+    resolver: zodResolver(CronJobSchema),
+    defaultValues: {
+      uri: job?.uri || "",
+      httpMethod: job?.httpMethod || "POST",
+      body: job?.body || "",
+      schedule: job?.schedule || "",
+      timeZone: job?.timeZone || "UTC",
+    },
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-
-    const uriValidation = validateUri(uri);
-    if (uriValidation) {
-      setUriError(uriValidation);
-      setLoading(false);
-      return; // stop submission
-    } else {
-      setUriError(null);
-    }
-
-    const cronJobData: Partial<CronJob> = {
-      id: job?.id,
-      uri,
-      httpMethod,
-      body,
-      schedule,
-      timeZone
-    };
-
+  const onSubmit = async (data: CronJobFormValues) => {
     try {
       if (job) {
-        await updateJob(cronJobData);
+        await updateJob({ ...data, id: job.id });
       } else {
-        await createJob(cronJobData);
+        await createJob(data);
       }
-      navigate('/dashboard');
+      navigate("/dashboard");
     } catch (err) {
-        if (err instanceof Error) {
-            setError(err.message);
-        } else {
-            setError('An unexpected error occurred');
-        }
-    } finally {
-      setLoading(false);
+      console.error(err);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-xl mx-auto p-4 space-y-4">
-      {error && <p className="text-red-500">{error}</p>}
+    <form onSubmit={handleSubmit(onSubmit)} className="max-w-xl mx-auto p-4 space-y-4">
+  <div>
+    <label className="block font-bold mb-1">URI</label>
+    <input
+      type="text"
+      {...register("uri")}
+      className="w-full border px-2 py-1 rounded"
+    />
+    {errors.uri && <p className="text-red-500 text-sm">{errors.uri.message}</p>}
+  </div>
 
-      <div>
-        <label className="block font-bold mb-1">URI</label>
-        <input
-          type="text"
-          value={uri}
-          onChange={e => {
-            setUri(e.target.value);
-            if (uriError) setUriError(validateUri(e.target.value));
-          }}
-          onBlur={() => setUriError(validateUri(uri))}
-          required
-          className="w-full border px-2 py-1 rounded"
-        />
-        {uriError && <p className="text-red-500 text-sm">{uriError}</p>}
-      </div>
+  <div>
+    <label className="block font-bold mb-1">HTTP Method</label>
+    <select {...register("httpMethod")} className="w-full border px-2 py-1 rounded">
+      {["GET","POST","PUT","PATCH","DELETE"].map(m => (
+        <option key={m} value={m}>{m}</option>
+      ))}
+    </select>
+    {errors.httpMethod && <p className="text-red-500 text-sm">{errors.httpMethod.message}</p>}
+  </div>
 
-      <div>
-        <label className="block font-bold mb-1">HTTP Method</label>
-        <select
-          value={httpMethod}
-          onChange={e => setHttpMethod(e.target.value as 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE')}
-          className="w-full border px-2 py-1 rounded"
-        >
-          {['GET','POST','PUT','PATCH','DELETE'].map(m => (
-            <option key={m} value={m}>{m}</option>
-          ))}
-        </select>
-      </div>
+  <div>
+    <label className="block font-bold mb-1">Body</label>
+    <textarea
+      {...register("body")}
+      className="w-full border px-2 py-1 rounded"
+      rows={4}
+    />
+    {errors.body && <p className="text-red-500 text-sm">{errors.body.message}</p>}
+  </div>
 
-      <div>
-        <label className="block font-bold mb-1">Body</label>
-        <textarea
-          value={body}
-          onChange={e => setBody(e.target.value)}
-          className="w-full border px-2 py-1 rounded"
-          rows={4}
-        />
-      </div>
+  <div>
+    <label className="block font-bold mb-1">Schedule (Cron expression)</label>
+    <input
+      type="text"
+      {...register("schedule")}
+      placeholder="* * * * * ?"
+      className="w-full border px-2 py-1 rounded"
+    />
+    {errors.schedule && <p className="text-red-500 text-sm">{errors.schedule.message}</p>}
+  </div>
 
-      <div>
-        <label className="block font-bold mb-1">Schedule (Cron expression)</label>
-        <input
-          type="text"
-          value={schedule}
-          onChange={e => setSchedule(e.target.value)}
-          required
-          className="w-full border px-2 py-1 rounded"
-          placeholder="* * * * * ?"
-        />
-      </div>
+  <div>
+    <label className="block font-bold mb-1">Time Zone</label>
+    <input
+      type="text"
+      {...register("timeZone")}
+      placeholder="UTC"
+      className="w-full border px-2 py-1 rounded"
+    />
+    {errors.timeZone && <p className="text-red-500 text-sm">{errors.timeZone.message}</p>}
+  </div>
 
-      <div>
-        <label className="block font-bold mb-1">Time Zone</label>
-        <input
-          type="text"
-          value={timeZone}
-          onChange={e => setTimeZone(e.target.value)}
-          required
-          className="w-full border px-2 py-1 rounded"
-          placeholder="UTC"
-        />
-      </div>
-
-      <button
-        type="submit"
-        disabled={loading}
-        className="bg-blue-500 text-white px-4 py-2 rounded"
-      >
-        {loading ? 'Saving...' : job ? 'Update Job' : 'Create Job'}
-      </button>
-    </form>
+  <button
+    type="submit"
+    disabled={isSubmitting}
+    className="bg-blue-500 text-white px-4 py-2 rounded"
+  >
+    {isSubmitting ? "Saving..." : job ? "Update Job" : "Create Job"}
+  </button>
+</form>
   );
 }
