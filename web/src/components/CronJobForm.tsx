@@ -30,6 +30,10 @@ export function CronJobForm({ job }: Props) {
     },
   });
 
+  const timeZones = Intl.supportedValuesOf?.('timeZone') || [
+    'UTC', 'America/New_York', 'Europe/London', 'Asia/Tokyo'
+  ];
+
   const onSubmit = async (data: CronJobFormValues) => {
     try {
       if (job) {
@@ -94,22 +98,35 @@ export function CronJobForm({ job }: Props) {
     <input
       type="text"
       {...register("schedule")}
-      placeholder="* * * * * ?"
       className="w-full border px-2 py-1 rounded"
     />
     {errors.schedule && <p className="text-red-500 text-sm">{errors.schedule.message}</p>}
   </div>
 
   <div>
-    <label className="block font-bold mb-1">Time Zone</label>
-    <input
-      type="text"
-      {...register("timeZone")}
-      placeholder="UTC"
-      className="w-full border px-2 py-1 rounded"
-    />
-    {errors.timeZone && <p className="text-red-500 text-sm">{errors.timeZone.message}</p>}
-  </div>
+  <label className="block font-bold mb-1">Time Zone</label>
+  <Controller
+    name="timeZone"
+    control={control}
+    render={({ field }) => (
+      <Select value={field.value} onValueChange={field.onChange}>
+        <SelectTrigger className="w-full">
+          <SelectValue placeholder="Select Time Zone" />
+        </SelectTrigger>
+        <SelectContent className="max-h-60 overflow-auto">
+          {timeZones.map((tz) => (
+            <SelectItem key={tz} value={tz}>
+              {tz}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    )}
+  />
+  {errors.timeZone && (
+    <p className="text-red-500 text-sm">{errors.timeZone.message}</p>
+  )}
+</div>
 
   <button
     type="submit"
