@@ -9,7 +9,6 @@ import {
 } from "../services/cronService";
 import { CronJobCard } from "../components/CronJobCard";
 import type { CronJob } from "../types/cron";
-import { Separator } from "@/components/ui/separator";
 import {
   Select,
   SelectContent,
@@ -17,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { PageHeader } from "../components/PageHeader";
 
 export function Dashboard() {
   const [jobs, setJobs] = useState<CronJob[]>([]);
@@ -73,10 +73,7 @@ export function Dashboard() {
 
   return (
     <div>
-      <div className="flex items-start justify-between my-3">
-        <h2 className="text-xl font-bold ml-3">CRON jobs manager</h2>
-      </div>
-      <Separator />
+      <PageHeader title="CRON jobs manager"></PageHeader>
       <div className="max-w-4xl mx-auto mt-8 px-4">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">

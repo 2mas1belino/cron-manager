@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { CronJobForm } from '../components/CronJobForm';
+import { PageHeader } from "../components/PageHeader";
 import { fetchJob } from '../services/cronService';
 import { useParams } from 'react-router-dom';
 import type { CronJob } from '../types/cron';
@@ -35,6 +36,7 @@ export function EditCron() {
 
   return (
     <div>
+      <PageHeader title="CRON jobs manager"></PageHeader>
       <h1 className="text-2xl font-bold mb-4 text-center">Edit Cron Job</h1>
       <CronJobForm job={job} />
     </div>
