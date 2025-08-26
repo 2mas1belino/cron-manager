@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { CronJobForm } from '../components/CronJobForm';
 import { fetchJob } from '../services/cronService';
 import { useParams } from 'react-router-dom';
