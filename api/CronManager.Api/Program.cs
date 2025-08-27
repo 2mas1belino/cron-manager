@@ -38,6 +38,11 @@ builder.Services.AddQuartz(q =>
             options.ConnectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
             options.TablePrefix = "qrtz_";
         });
+
+        store.UseClustering(clustering =>
+        {
+            clustering.CheckinInterval = TimeSpan.FromSeconds(20);
+        });
     });
 });
 

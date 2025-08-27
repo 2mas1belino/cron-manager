@@ -1,9 +1,6 @@
-version: "3.9"
-
 services:
   db:
     image: postgres:16
-    container_name: cron_db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -14,24 +11,32 @@ services:
       - db-data:/var/lib/postgresql/data
 
   api:
-    build: ./api/CronManager.Api
-    container_name: cron_api
+    image: cron-manager-api
     environment:
-      - DOTNET_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://+:5190
-      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Username=postgres;Password=postgres;Database=quartz
+      DOTNET_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:5190
+      ConnectionStrings__DefaultConnection: Host=db;Port=5432;Username=postgres;Password=postgres;Database=quartz
     depends_on:
       - db
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
     ports:
-      - "5190:5190"
+      - target: 5190
+        published: 5190
+        protocol: tcp
+        mode: ingress
 
   receiver:
-    build: ./receiver/Receiver
-    container_name: cron_receiver
+    image: cron-manager-receiver
     environment:
-    - ASPNETCORE_URLS=http://+:5000
+      ASPNETCORE_URLS: http://+:5000
     ports:
-      - "5200:5000"
+      - target: 5000
+        published: 5200
+        protocol: tcp
+        mode: host
 
 volumes:
   db-data:
