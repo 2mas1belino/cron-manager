@@ -1,0 +1,245 @@
+{
+	"info": {
+		"_postman_id": "5994b820-ca5a-427e-a961-359bed6df397",
+		"name": "CronManager API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "32069605"
+	},
+	"item": [
+		{
+			"name": "Create a job",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": \"11111111-1111-1111-1111-111111111111\",\r\n    \"uri\": \"http://receiver:5000/notify\",\r\n    \"httpMethod\": \"POST\",\r\n    \"body\": \"{\\\"message\\\":\\\"Hello from Quartz\\\"}\",\r\n    \"schedule\": \"0/10 * * * * ?\", \r\n    \"timeZone\": \"UTC\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/api/crons",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"api",
+						"crons"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create a job 2",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": \"11111111-1111-1111-1111-111111111111\",\r\n    \"uri\": \"http://receiver:5000/notify\",\r\n    \"httpMethod\": \"POST\",\r\n    \"body\": \"{\\\"message\\\":\\\"Hello from Quartz\\\"}\",\r\n    \"schedule\": \"0/10 * * * * ?\", \r\n    \"timeZone\": \"UTC\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/api/crons",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"api",
+						"crons"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List all jobs",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/api/crons",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"api",
+						"crons"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get one job",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/api/crons/{{jobId}}",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"api",
+						"crons",
+						"{{jobId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update a job",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": \"00000000-0000-0000-0000-000000000000\",\r\n    \"uri\": \"http://example.com/notify\",\r\n    \"httpMethod\": \"POST\",\r\n    \"body\": \"{\\\"message\\\": \\\"Updated message\\\"}\",\r\n    \"schedule\": \"0/2 * * * * ?\", \r\n    \"timeZone\": \"UTC\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/api/crons/{{jobId}}",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"api",
+						"crons",
+						"{{jobId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete a job",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": \"00000000-0000-0000-0000-000000000000\",\r\n    \"uri\": \"http://example.com/notify\",\r\n    \"httpMethod\": \"POST\",\r\n    \"body\": \"{\\\"message\\\": \\\"Updated message\\\"}\",\r\n    \"schedule\": \"0/2 * * * * ?\", \r\n    \"timeZone\": \"UTC\"\r\n}"
+				},
+				"url": {
+					"raw": "{{baseURL}}/api/crons/{{jobId}}",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"api",
+						"crons",
+						"{{jobId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Pause a job",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/api/crons/{{jobId}}/pause",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"api",
+						"crons",
+						"{{jobId}}",
+						"pause"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Resume a job",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/api/crons/{{jobId}}/resume",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"api",
+						"crons",
+						"{{jobId}}",
+						"resume"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Run a job now",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "Notifying Receiver Test",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseURL",
+			"value": "http://localhost:5190",
+			"type": "default"
+		},
+		{
+			"key": "jobId",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
