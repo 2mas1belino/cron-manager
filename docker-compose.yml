@@ -20,23 +20,19 @@ services:
       - db
     deploy:
       replicas: 2
-      restart_policy:
-        condition: on-failure
     ports:
       - target: 5190
         published: 5190
         protocol: tcp
         mode: ingress
+    hostname: "cron-api-{{.Task.Slot}}"
 
   receiver:
     image: cron-manager-receiver
     environment:
       ASPNETCORE_URLS: http://+:5000
     ports:
-      - target: 5000
-        published: 5200
-        protocol: tcp
-        mode: host
+      - "5200:5000"
 
 volumes:
   db-data:

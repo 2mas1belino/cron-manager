@@ -1,4 +1,5 @@
 using Quartz;
+using Microsoft.Extensions.Logging;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -6,25 +7,18 @@ using System.Threading.Tasks;
 public class HttpNotifyJob : IJob
 {
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ILogger<HttpNotifyJob> _logger;
 
-    public HttpNotifyJob(IHttpClientFactory httpClientFactory)
+    public HttpNotifyJob(IHttpClientFactory httpClientFactory, ILogger<HttpNotifyJob> logger)
     {
         _httpClientFactory = httpClientFactory;
+        _logger = logger;
     }
 
     public async Task Execute(IJobExecutionContext context)
     {
-        // var client = _httpClientFactory.CreateClient();
-        // var jobData = context.MergedJobDataMap;
-        // var uri = jobData.GetString("Uri");
-        // var body = jobData.GetString("Body");
-
-        // if (!string.IsNullOrEmpty(uri))
-        // {
-        //     var content = new StringContent(body ?? "", Encoding.UTF8, "application/json");
-        //     await client.PostAsync(uri, content);
-        //     Console.WriteLine($"[{DateTime.UtcNow}] Sent job to {uri} with body: {body}");
-        // }
+        var schedulerId = context.Scheduler.SchedulerInstanceId; // Quartz instance ID
+        var hostName = Environment.MachineName; // Docker container hostname
 
         var dataMap = context.JobDetail.JobDataMap;
         var uri = dataMap.GetString("Uri")!;
@@ -41,10 +35,13 @@ public class HttpNotifyJob : IJob
 
         var response = await client.SendAsync(request);
 
-        // Optional: log success/failure
         if (!response.IsSuccessStatusCode)
         {
-            Console.WriteLine($"Failed notifying {uri}: {response.StatusCode}");
+            _logger.LogWarning("Failed notifying {Uri}: {StatusCode}", uri, response.StatusCode);
         }
+
+        _logger.LogInformation(
+            "Job {JobKey} executed by host: {HostName}, scheduler: {SchedulerId}, status: {StatusCode}",
+            context.JobDetail.Key, hostName, schedulerId, response.StatusCode);
     }
 }
