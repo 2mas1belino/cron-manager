@@ -12,6 +12,7 @@ services:
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
 
   api:
+    build: ./api/CronManager.Api
     image: cron-manager-api
     environment:
       DOTNET_ENVIRONMENT: Development
@@ -29,6 +30,7 @@ services:
     hostname: "cron-api-{{.Task.Slot}}"
 
   receiver:
+    build: ./receiver/Receiver
     image: cron-manager-receiver
     environment:
       ASPNETCORE_URLS: http://+:5000
