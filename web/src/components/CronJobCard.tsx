@@ -36,13 +36,32 @@ export function CronJobCard({
     }
   };
 
+  const methodColor = (method: string) => {
+    switch (method.toUpperCase()) {
+      case "POST":
+        return "text-yellow-400";
+      case "GET":
+        return "text-green-400";
+      case "DELETE":
+        return "text-red-400";
+      case "PATCH":
+        return "text-purple-400";
+      case "PUT":
+        return "text-blue-400";
+      default:
+        return "text-gray-400";
+    }
+  };
+
   return (
     <div className="bg-gray-900 rounded-lg shadow-md p-4 mb-4">
       {/* Header */}
       <div className="flex justify-between items-center mb-2">
         <h3 className="text-lg">
-          <span className="font-semibold text-gray-400">URI: </span>
-          {job.uri}
+          <span className={`font-semibold ${methodColor(job.httpMethod)} mr-2`}>
+            {job.httpMethod.toUpperCase()}
+          </span>
+          {job.uri}{" "}
         </h3>
         <span
           className={`text-xs font-medium px-2 py-1 rounded ${
